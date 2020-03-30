@@ -117,7 +117,11 @@ if __name__ == '__main__':
     else:
         print("Model found.\n")
     y_predict, y_true = svm_OVR_test(model_path)
-    analysis.my_classification_report(y_true, y_predict)
+
+    #analysis.my_classification_report(y_true, y_predict, True)
+    np.savetxt('y_pred.txt', y_predict, delimiter=',')
+    np.savetxt('y_true.txt', y_true, delimiter=',')
+    analysis.my_confusion_matrix(y_true, y_predict, ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'])
  
  #'C:\\Miniconda3\\envs\\HybridPy\\python38.zip\\model\\svm.model'
  #FileNotFoundError: [Errno 2] No such file or directory: 'E:/Statistical-Learning-Method_Code/raw\\model/svm.model'
