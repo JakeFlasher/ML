@@ -84,10 +84,10 @@ def binary2img(binfile, binlabel, folders):
 
 
 if __name__ == "__main__":
-    trainimg = './mnist/raw/train-images.idx3-ubyte'
-    trainlabel = './mnist/raw/train-labels.idx1-ubyte'
-    testimg = './mnist/raw/t10k-images.idx3-ubyte'
-    testlabel = './mnist/raw/t10k-labels.idx1-ubyte'
+    trainimg = './mnist/fashion/train-images-idx3-ubyte'
+    trainlabel = './mnist/fashion/train-labels-idx1-ubyte'
+    testimg = './mnist/fashion/t10k-images-idx3-ubyte'
+    testlabel = './mnist/fashion/t10k-labels-idx1-ubyte'
     trainfolder = './mnist/train'
     testfolder = './mnist/test'
     if not os.path.exists(trainfolder): os.makedirs(trainfolder)
