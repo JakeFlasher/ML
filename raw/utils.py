@@ -114,7 +114,7 @@ def convert2csv():
 
 if __name__ == "__main__":
     convert2csv()
-    if (int(intput()) == 1):
+    if (int(input()) == 1):
         trainimg = './mnist/fashion/train-images-idx3-ubyte'
         trainlabel = './mnist/fashion/train-labels-idx1-ubyte'
         testimg = './mnist/fashion/t10k-images-idx3-ubyte'

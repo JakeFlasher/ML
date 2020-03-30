@@ -43,8 +43,8 @@ random_state ：数据洗牌时的种子值，int值
 主要调节的参数有：C、kernel、degree、gamma、coef0
 '''
 def svm_OVR_test(model_path):
-    #path = sys.path[1]
-    path = "E:/Statistical-Learning-Method_Code/raw"
+    path = sys.path[1]
+    #path = "E:/Statistical-Learning-Method_Code/raw"
     tbasePath = os.path.join(path, "mnist/test/")
     tcName = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']
     tst = time.time()
@@ -107,22 +107,29 @@ if __name__ == '__main__':
     # clf = svm.SVC(decision_function_shape='ovr')
     st = time.time()
     dataMat, dataLabel = utils.read_folder_img()
-    # path = sys.path[1]
-    path = "E:/Statistical-Learning-Method_Code/raw"
+    path = sys.path[1]
+    #path = "E:/Statistical-Learning-Method_Code/raw"
     model_path=os.path.join(path,'model/svm_fashion.model')
     if not os.path.exists(model_path):
         print("start training.\n")
         create_svm(dataMat, dataLabel, model_path, decision='ovr')
         et = time.time()
-        print("Training spent {:.4f}s.".format((et - st)))
+        with open("training.txt", 'w') as f:
+            print("Training spent {:.4f}s.".format((et - st)), file=f)
     else:
         print("Model found.\n")
     y_predict, y_true = svm_OVR_test(model_path)
+    
+    from sklearn.metrics import classification_report
+    with open("report.txt", 'w') as f:
+        print("classification report(left: labels):", file=f)
+        print(classification_report(y_true, y_predict), file=f)
 
     #analysis.my_classification_report(y_true, y_predict, True)
-    np.savetxt('y_pred.txt', y_predict, delimiter=',')
-    np.savetxt('y_true.txt', y_true, delimiter=',')
-    analysis.my_confusion_matrix(y_true, y_predict, ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'])
+    np.savetxt('y_pred.txt', y_predict, fmt="%s", delimiter=',')
+    np.savetxt('y_true.txt', y_true, fmt="%s", delimiter=',')
+    analysis.my_confusion_matrix(y_true, y_predict)
+    #analysis.my_confusion_matrix(y_true, y_predict, ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'])
  
  #'C:\\Miniconda3\\envs\\HybridPy\\python38.zip\\model\\svm.model'
  #FileNotFoundError: [Errno 2] No such file or directory: 'E:/Statistical-Learning-Method_Code/raw\\model/svm.model'
