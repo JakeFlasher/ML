@@ -43,7 +43,7 @@ random_state ：数据洗牌时的种子值，int值
 主要调节的参数有：C、kernel、degree、gamma、coef0
 '''
 def svm_OVR_test(model_path):
-    path = sys.path[1]
+    path = sys.path[0]
     #path = "E:/Statistical-Learning-Method_Code/raw"
     tbasePath = os.path.join(path, "mnist/test/")
     tcName = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']
@@ -107,10 +107,11 @@ if __name__ == '__main__':
     # clf = svm.SVC(decision_function_shape='ovr')
     st = time.time()
     dataMat, dataLabel = utils.read_folder_img()
-    path = sys.path[1]
+    path = sys.path[0]
     #path = "E:/Statistical-Learning-Method_Code/raw"
     model_path=os.path.join(path,'model/svm_fashion.model')
     if not os.path.exists(model_path):
+        os.makedirs(model_path)
         print("start training.\n")
         create_svm(dataMat, dataLabel, model_path, decision='ovr')
         et = time.time()
