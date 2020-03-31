@@ -44,7 +44,10 @@ random_state ：数据洗牌时的种子值，int值
 '''
 def svm_OVR_test(model_path):
     path = sys.path[0]
+<<<<<<< HEAD
     #path = sys.path[1]
+=======
+>>>>>>> 894b59488ea9614529cc137f5c6edbe8216076e1
     #path = "E:/Statistical-Learning-Method_Code/raw"
     tbasePath = os.path.join(path, "mnist/test/")
     tcName = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']
@@ -109,26 +112,42 @@ if __name__ == '__main__':
 
     st = time.time()
     dataMat, dataLabel = utils.read_folder_img()
+<<<<<<< HEAD
     #path = sys.path[0]
     path = ""
     #path = sys.path[1]
+=======
+    path = sys.path[0]
+>>>>>>> 894b59488ea9614529cc137f5c6edbe8216076e1
     #path = "E:/Statistical-Learning-Method_Code/raw"
     model_path=os.path.join(path,'model/svm_fashion.model')
     print(model_path)
     if not os.path.exists(model_path):
+<<<<<<< HEAD
         os.makedirs(model_path)
+=======
+        if not os.path.exists(os.path.join(path, 'model/')):
+            os.makedirs(os.path.join(path, 'model'))
+>>>>>>> 894b59488ea9614529cc137f5c6edbe8216076e1
         print("start training.\n")
         create_svm(dataMat, dataLabel, model_path, decision='ovr')
         et = time.time()
-        print("Training spent {:.4f}s.".format((et - st)))
+        with open("training.txt", 'w') as f:
+            print("Training spent {:.4f}s.".format((et - st)), file=f)
     else:
         print("Model found.\n")
     y_predict, y_true = svm_OVR_test(model_path)
+    
+    from sklearn.metrics import classification_report
+    with open("report.txt", 'w') as f:
+        print("classification report(left: labels):", file=f)
+        print(classification_report(y_true, y_predict), file=f)
 
     #analysis.my_classification_report(y_true, y_predict, True)
-    np.savetxt('y_pred.txt', y_predict, delimiter=',')
-    np.savetxt('y_true.txt', y_true, delimiter=',')
-    analysis.my_confusion_matrix(y_true, y_predict, ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'])
+    np.savetxt('y_pred.txt', y_predict, fmt="%s", delimiter=',')
+    np.savetxt('y_true.txt', y_true, fmt="%s", delimiter=',')
+    analysis.my_confusion_matrix(y_true, y_predict)
+    #analysis.my_confusion_matrix(y_true, y_predict, ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'])
  
  #'C:\\Miniconda3\\envs\\HybridPy\\python38.zip\\model\\svm.model'
  #FileNotFoundError: [Errno 2] No such file or directory: 'E:/Statistical-Learning-Method_Code/raw\\model/svm.model'
