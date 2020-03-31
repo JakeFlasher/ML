@@ -111,7 +111,8 @@ if __name__ == '__main__':
     #path = "E:/Statistical-Learning-Method_Code/raw"
     model_path=os.path.join(path,'model/svm_fashion.model')
     if not os.path.exists(model_path):
-        os.makedirs(model_path)
+        if not os.path.exists(os.path.join(path, 'model/')):
+            os.makedirs(os.path.join(path, 'model'))
         print("start training.\n")
         create_svm(dataMat, dataLabel, model_path, decision='ovr')
         et = time.time()
