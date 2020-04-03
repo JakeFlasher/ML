@@ -5,49 +5,36 @@ import sys
 import numpy as np
 import time
 from sklearn import svm
+from tuning import grid_search
 import utils 
 import analysis
 import matplotlib.pyplot as plt
 import joblib
+
 # create model
 def create_svm(dataMat, dataLabel,path,decision='ovr'):
     # SVC(C=1.0, cache_size=200, class_weight=None, coef0=0.0, decision_function_shape=None, degree=3, gamma='auto', kernel='rbf', max_iter=-1, probability=False, random_state=None, shrinking=True,tol=0.001, verbose=False)
-    clf = svm.SVC(C=1.0,kernel='rbf',decision_function_shape=decision)
-    rf =clf.fit(dataMat, dataLabel)
-    joblib.dump(rf, path)
-    return clf
-'''
-SVC参数
-svm.SVC(C=1.0,kernel='rbf',degree=3,gamma='auto',coef0=0.0,shrinking=True,probability=False,
-tol=0.001,cache_size=200,class_weight=None,verbose=False,max_iter=-1,decision_function_shape='ovr',random_state=None)
-C：C-SVC的惩罚参数C?默认值是1.0
-C越大，相当于惩罚松弛变量，希望松弛变量接近0，即对误分类的惩罚增大，趋向于对训练集全分对的情况，这样对训练集测试时
-准确率很高，但泛化能力弱。C值小，对误分类的惩罚减小，允许容错，将他们当成噪声点，泛化能力较强。
-kernel ：核函数，默认是rbf，可以是‘linear’, ‘poly’, ‘rbf’, ‘sigmoid’, ‘precomputed’ 
-       0 – 线性：u'v
- 　　 1 – 多项式：(gamma*u'*v + coef0)^degree
-  　　2 – RBF函数：exp(-gamma|u-v|^2)
-  　　3 –sigmoid：tanh(gamma*u'*v + coef0)
-degree ：多项式poly函数的维度，默认是3，选择其他核函数时会被忽略。（没用）
-gamma ： ‘rbf’,‘poly’ 和‘sigmoid’的核函数参数。默认是’auto’，则会选择1/n_features
-coef0 ：核函数的常数项。对于‘poly’和 ‘sigmoid’有用。（没用）
-probability ：是否采用概率估计？.默认为False
-shrinking ：是否采用shrinking heuristic方法，默认为true
-tol ：停止训练的误差值大小，默认为1e-3
-cache_size ：核函数cache缓存大小，默认为200
-class_weight ：类别的权重，字典形式传递。设置第几类的参数C为weight*C(C-SVC中的C)
-verbose ：允许冗余输出？
-max_iter ：最大迭代次数。-1为无限制。
-decision_function_shape ：‘ovo’, ‘ovr’ or None, default=None3（选用ovr，一对多）
-random_state ：数据洗牌时的种子值，int值
-主要调节的参数有：C、kernel、degree、gamma、coef0
-'''
-def svm_OVR_test(model_path):
+    # clf = svm.SVC(C=1.0,kernel='rbf',decision_function_shape=decision)
+    # rf =clf.fit(dataMat, dataLabel)
+    '''
+    param_grid = [{'kernel': ['rbf'], 'gamma': [1e-1, 1e-2, 1e-3, 1e-4], 'C': [0.1, 1, 10, 100, 1000], 'decision_function_shape': ['ovr']},
+                    {'kernel': ['linear'], 'C': [0.01, 0.1, 1, 10, 100, 1000, 10000],'decision_function_shape': ['ovr']},
+                    {'kernel': ['sigmoid'], 'gamma': [1e-1, 1e-2, 1e-3, 1e-4], 'coef0': [0.1, 0, 1, 3], 'C': [0.1, 1, 10, 100, 1000],'decision_function_shape': ['ovr']},
+                    {'kernel': ['poly'], 'degree': [3,4,5,6], 'gamma': [1e-1, 1e-2, 1e-3, 1e-4], 'coef0': [0.1, 0, 1, 3],'decision_function_shape': ['ovr']}]
+    '''
+    tuned_params= [{'kernel': ['rbf'], 'gamma': [1e-3],
+                     'C': [1, 10]}]
+    print("Tuning parameters: %s" % tuned_params)
+    scores = ['precision', 'recall']
+    clf_list = grid_search(tuned_params, scores, [dataMat, dataLabel])
+    if (input("Dump models now? [y/n]") == 'y'):
+        for clf in clf_list:
+            joblib.dump(clf, path)
+    return clf_list
+
+def model_test(model_path, clf=None):
     path = sys.path[0]
-<<<<<<< HEAD
     #path = sys.path[1]
-=======
->>>>>>> 894b59488ea9614529cc137f5c6edbe8216076e1
     #path = "E:/Statistical-Learning-Method_Code/raw"
     tbasePath = os.path.join(path, "mnist/test/")
     tcName = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']
@@ -56,8 +43,9 @@ def svm_OVR_test(model_path):
     allErrCount = 0; allErrorRate = 0.0; allScore = 0.0
     ErrCount=np.zeros(10,int); TrueCount=np.zeros(10,int)
     predict_list = []; true_list = []
-    #加载模型
-    clf = joblib.load(model_path)
+
+    if clf == None:
+        clf = joblib.load(model_path)
     for tcn in tcName:
         testPath = tbasePath + tcn
         tflist = utils.file2list(testPath)
@@ -111,32 +99,29 @@ if __name__ == '__main__':
     # clf = svm.SVC(decision_function_shape='ovr')
 
     st = time.time()
+    #dataMat, dataLabel = utils.read_folder_img()
     dataMat, dataLabel = utils.read_folder_img()
-<<<<<<< HEAD
-    #path = sys.path[0]
-    path = ""
     #path = sys.path[1]
-=======
     path = sys.path[0]
->>>>>>> 894b59488ea9614529cc137f5c6edbe8216076e1
     #path = "E:/Statistical-Learning-Method_Code/raw"
-    model_path=os.path.join(path,'model/svm_fashion.model')
+    model_path=os.path.join(path,'model/svm_best.model')
     print(model_path)
     if not os.path.exists(model_path):
-<<<<<<< HEAD
-        os.makedirs(model_path)
-=======
         if not os.path.exists(os.path.join(path, 'model/')):
             os.makedirs(os.path.join(path, 'model'))
->>>>>>> 894b59488ea9614529cc137f5c6edbe8216076e1
         print("start training.\n")
-        create_svm(dataMat, dataLabel, model_path, decision='ovr')
+        clf_list = create_svm(dataMat, dataLabel, model_path, decision='ovr')
+        for clf in clf_list:
+            print(clf)
         et = time.time()
         with open("training.txt", 'w') as f:
             print("Training spent {:.4f}s.".format((et - st)), file=f)
     else:
         print("Model found.\n")
-    y_predict, y_true = svm_OVR_test(model_path)
+
+
+    clf = clf_list[0]
+    y_predict, y_true = model_test(model_path, clf=clf)
     
     from sklearn.metrics import classification_report
     with open("report.txt", 'w') as f:

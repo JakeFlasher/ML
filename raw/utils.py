@@ -57,8 +57,8 @@ def read2convert(imgFileList):
     return dataMat, dataLabel
 
 # 读取训练数据
-def read_folder_img():
-    cName = ['1', '2', '3', '4', '5', '6', '7', '8', '9']
+def read_folder_img(cName=['1', '2', '3', '4', '5', '6', '7', '8', '9']):
+    #cName = ['1', '2']
     train_data_path = "./mnist/train/0"
     flist = file2list(train_data_path,".png")
     dataMat, dataLabel = read2convert(flist)

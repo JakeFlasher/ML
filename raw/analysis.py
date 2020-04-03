@@ -1,3 +1,4 @@
+#-*-coding=utf-8-*-
 import matplotlib.pyplot as plt
 import numpy as np
 
@@ -29,7 +30,7 @@ def plot_roc_curve(fpr, tpr, label=None):
     plt.savefig('./roc.jpg')
     #plt.show()
 
-def plot_confusion_matrix(cm, savename, title='Confusion Matrix'):
+def plot_confusion_matrix(classes, cm, savename, title='Confusion Matrix'):
     plt.figure(figsize=(12, 8), dpi=100)
     np.set_printoptions(precision=2)
      # 在混淆矩阵中每格的概率值
@@ -113,35 +114,35 @@ def print_s(name, value, sign='=', filename='metrics.txt'):
                 #print(str(value).rjust(len(name)+len(str(value))))
                 #print("%s = " % name, value)
 
-def my_metrics(TN, FP, FN, TP):
+def my_metrics(TN, FP, FN, TP, filename='metrics.txt'):
     # Sensitivity, hit rate, recall, or true positive rate
     TPR = TP/(TP+FN)
-    print_s('True positive rate', TPR)
+    print_s('True positive rate', TPR, filename)
     # Specificity or true negative rate
     TNR = TN/(TN+FP) 
-    print_s('True Negative rate', TNR)
+    print_s('True Negative rate', TNR, filename)
     # Precision or positive predictive value
     PPV = TP/(TP+FP)
-    print_s('Positive predictive value', PPV)
+    print_s('Positive predictive value', PPV, filename)
     # Negative predictive value
     NPV = TN/(TN+FN)
-    print_s('Negative predictive value', NPV)
+    print_s('Negative predictive value', NPV, filename)
     # Fall out or false positive rate
     FPR = FP/(FP+TN)
-    print_s('False positive rate', FPR)
+    print_s('False positive rate', FPR, filename)
     # False negative rate
     FNR = FN/(TP+FN)
-    print_s('False negative rate', FNR)
+    print_s('False negative rate', FNR, filename)
     # False discovery rate
     FDR = FP/(TP+FP)
-    print_s('False discovery rate', FDR)
+    print_s('False discovery rate', FDR, filename)
 
     precision = TP / (TP+FP)  # 查准率
-    print_s('Precision', precision)
+    print_s('Precision', precision, filename)
     recall = TP / (TP+FN)  # 查全率
-    print_s('Recall', recall)
+    print_s('Recall', recall, filename)
 
-def my_confusion_matrix(y_true, y_pred, label_list=[]):
+def my_confusion_matrix(y_true, y_pred, label_list=[], filename='conf_mat.txt'):
     import numpy as np
     from sklearn.metrics import confusion_matrix
     from sklearn.metrics import precision_recall_fscore_support
@@ -150,12 +151,12 @@ def my_confusion_matrix(y_true, y_pred, label_list=[]):
         labels = list(set(y_true))
     else:
         labels = label_list
-    
+    print(y_true); print(y_pred); print(labels)
     conf_mat = confusion_matrix(y_true, y_pred, labels = labels)
-    print_s("Confusion matrix", conf_mat, '\n')
+    print_s("Confusion matrix", conf_mat, '\n', filename)
     conf_mat = conf_mat.astype('float') / conf_mat.sum(axis=1)[:, np.newaxis]
-    plot_confusion_matrix(conf_mat, 'conf_mat.png', 'confusion matrix')
-    print_s("Normalized confusion matrix", conf_mat, '\n')
+    #plot_confusion_matrix(list(set(y_true)), conf_mat, 'conf_mat.png', 'confusion matrix')
+    print_s("Normalized confusion matrix", conf_mat, '\n', filename)
 
     if len(label_list) == 2:
         TN, FP, FN, TP = conf_mat.ravel()
@@ -166,19 +167,19 @@ def my_confusion_matrix(y_true, y_pred, label_list=[]):
         TP = np.diag(conf_mat)
         TN = conf_mat.sum() - (FP + FN + TP)
 
-    my_metrics(TN, FP, FN, TP)
+    my_metrics(TN, FP, FN, TP, filename)
 
     p_class, r_class, f_class, support_micro=precision_recall_fscore_support(y_true=y_true, y_pred=y_pred, average=None)
     #print(p_class); print(r_class); print(f_class); print(support_micro)
-    print_s('Macro F1 score', f_class.mean())
-    print_s('Micro F1 score', f1_score(y_true, y_pred, average='micro'))
-    print_s('Weighted F1 score', f1_score(y_true, y_pred, average='weighted'))
+    print_s('Macro F1 score', f_class.mean(), filename)
+    print_s('Micro F1 score', f1_score(y_true, y_pred, average='micro'), filename)
+    print_s('Weighted F1 score', f1_score(y_true, y_pred, average='weighted'), filename)
 
-    np.savetxt('conf_mat.txt', conf_mat, delimiter=',')
+    #np.savetxt('conf_mat.txt', conf_mat, delimiter=',')
     
     return [p_class,r_class, f_class]
  
-def my_classification_report(y_true, y_pred, multiclass=False):
+def my_classification_report(y_true, y_pred, multiclass=False, filename='report.txt'):
     from sklearn.metrics import precision_score, recall_score
     #from sklearn.metrics import f1_score
     if multiclass == False:
@@ -189,22 +190,31 @@ def my_classification_report(y_true, y_pred, multiclass=False):
         precisions,recalls,thresholds = precision_recall_curve(y_true, y_pred)
         plot_precision_recall_vs_threshold(precisions, recalls, thresholds)
 
-    my_confusion_matrix(y_true, y_pred)
+    my_confusion_matrix(y_true, y_pred, [], filename)
 
     from sklearn.metrics import classification_report
-    f = open("report.txt", 'w')
-    print("classification_report(left: labels):", file=f)
-    print(classification_report(y_true, y_pred), file=f)
-    f.close()
+    with open(filename, 'a') as f:
+        print("classification_report(left: labels):", file=f)
+        print(classification_report(y_true, y_pred), file=f)
 
 if __name__ == '__main__':
-    classes = ['A', 'B', 'C', 'D', 'E', 'F']
+    import os
+    if os.path.exists("./y_pred.txt") and os.path.exists("./y_true.txt"):
+        with open ("y_pred.txt") as f_pred:
+            print("loading local results")
+            y_pred = [];
+            for l in f_pred.readlines():
+                y_pred.append(l.strip('\n')[0])
+        y_pred = np.array(y_pred)
 
-    random_numbers = np.random.randint(6, size=500)  # 6个类别，随机生成50个样本
-    y_true = random_numbers.copy()  # 样本实际标签
-    random_numbers[:100] = np.random.randint(6, size=100)  # 将前10个样本的值进行随机更改
-    y_pred = random_numbers  # 样本预测标签
+        with open("y_true.txt") as f_true:
+            print("loading local results")
+            y_true = []
+            for l in f_true.readlines():
+                y_true.append(l.strip('\n')[0])
+        y_true = np.array(y_true)
 
-    # 获取混淆矩阵
+        print(y_true)
+
     #my_confusion_matrix(y_true, y_pred)
     my_classification_report(y_true, y_pred, True)
