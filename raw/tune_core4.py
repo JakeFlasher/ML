@@ -20,7 +20,7 @@ def create_svm(dataMat, dataLabel,path,decision='ovr'):
     print("Parameters:{}".format(param_grid))
     scores = ['precision', 'recall']
     print("Tuning parameters: %s" % param_grid)
-    clf_list = grid_search(param_grid, scores, [dataMat, dataLabel], 'tuningt.txt')
+    clf_list = grid_search(param_grid, scores, [dataMat, dataLabel], './tuning4/tuningt.txt')
     
     return clf_list
 
@@ -92,7 +92,7 @@ if __name__ == '__main__':
     st = time.time()
     iris = load_iris()
 
-    dataMat, dataLabel = utils.read_folder_img(cName = ['1', '2', '3', '4', '5', '6', '7', '8', '9'])
+    dataMat, dataLabel = utils.read_folder_img(cName = ['1', '2', '3', '4', '5', '6', '7', '8', '9'], delimit=6)
     print(dataMat.shape); print(dataLabel)
     path = sys.path[0]
     model_path=os.path.join(path,'model/svm_best.model')    
@@ -101,8 +101,8 @@ if __name__ == '__main__':
     i = 0; 
     for clf in clf_list:
         scores = ['precision', 'accuracy']
-        y_predict, y_true = model_test(model_path, clf, './tuning1/out_%s_test.txt' % scores[i], ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'])
-        analysis.my_classification_report(y_true, y_predict, True, './tuning1/report_%s_test.txt' % scores[i])
+        y_predict, y_true = model_test(model_path, clf, './tuning4/out_%s_test.txt' % scores[i], ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'])
+        analysis.my_classification_report(y_true, y_predict, True, './tuning4/report_%s_test.txt' % scores[i])
+        np.savetxt('./tuning4/y_pred_%s.txt' % scores[i], y_predict, fmt="%s", delimiter=',')
+        np.savetxt('./tuning4/y_true_%s.txt' % scores[i], y_true, fmt="%s", delimiter=',')
         i += 1
-        np.savetxt('./tuning1/y_pred_%s.txt' % scores[i], y_predict, fmt="%s", delimiter=',')
-        np.savetxt('./tuning1/y_true_%s.txt' % scores[i], y_true, fmt="%s", delimiter=',')

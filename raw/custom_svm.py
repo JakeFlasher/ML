@@ -14,16 +14,12 @@ import joblib
 # create model
 def create_svm(dataMat, dataLabel,path,decision='ovr'):
     # SVC(C=1.0, cache_size=200, class_weight=None, coef0=0.0, decision_function_shape=None, degree=3, gamma='auto', kernel='rbf', max_iter=-1, probability=False, random_state=None, shrinking=True,tol=0.001, verbose=False)
-    # clf = svm.SVC(C=1.0,kernel='rbf',decision_function_shape=decision)
-    # rf =clf.fit(dataMat, dataLabel)
+
     '''
     param_grid = [{'kernel': ['rbf'], 'gamma': [1e-1, 1e-2, 1e-3, 1e-4], 'C': [0.1, 1, 10, 100, 1000], 'decision_function_shape': ['ovr']},
                     {'kernel': ['linear'], 'C': [0.01, 0.1, 1, 10, 100, 1000, 10000],'decision_function_shape': ['ovr']},
                     {'kernel': ['sigmoid'], 'gamma': [1e-1, 1e-2, 1e-3, 1e-4], 'coef0': [0.1, 0, 1, 3], 'C': [0.1, 1, 10, 100, 1000],'decision_function_shape': ['ovr']},
                     {'kernel': ['poly'], 'degree': [3,4,5,6], 'gamma': [1e-1, 1e-2, 1e-3, 1e-4], 'coef0': [0.1, 0, 1, 3],'decision_function_shape': ['ovr']}]
-    '''
-    tuned_params= [{'kernel': ['rbf'], 'gamma': [1e-3],
-                     'C': [1, 10]}]
     print("Tuning parameters: %s" % tuned_params)
     scores = ['precision', 'recall']
     clf_list = grid_search(tuned_params, scores, [dataMat, dataLabel])
@@ -31,6 +27,15 @@ def create_svm(dataMat, dataLabel,path,decision='ovr'):
         for clf in clf_list:
             joblib.dump(clf, path)
     return clf_list
+    Best parameters found for each kernel
+    clf = svm.SVC(C=10, kernel='rbf', gamma=0.01, decision_function_shape=decision)
+    clf = svm.SVC(C=10,kernel='linear',decision_function_shape=decision)
+    '''
+    clf = svm.SVC(C=100,kernel='sigmoid',coef0=0.1, gamma=1, decision_function_shape=decision)
+    clf = clf.fit(dataMat, dataLabel)
+    #if (input("Dump models now? [y/n]") == 'y'):
+    #    joblib.dump(clf, path)
+    return clf
 
 def model_test(model_path, clf=None):
     path = sys.path[0]
@@ -111,27 +116,26 @@ if __name__ == '__main__':
             os.makedirs(os.path.join(path, 'model'))
         print("start training.\n")
         clf_list = create_svm(dataMat, dataLabel, model_path, decision='ovr')
-        for clf in clf_list:
-            print(clf)
+
         et = time.time()
-        with open("training.txt", 'w') as f:
+        with open("report.txt", 'w') as f:
             print("Training spent {:.4f}s.".format((et - st)), file=f)
     else:
         print("Model found.\n")
 
 
-    clf = clf_list[0]
+    clf = clf_list
     y_predict, y_true = model_test(model_path, clf=clf)
     
     from sklearn.metrics import classification_report
-    with open("report.txt", 'w') as f:
+    with open("report.txt", 'a') as f:
         print("classification report(left: labels):", file=f)
         print(classification_report(y_true, y_predict), file=f)
 
-    #analysis.my_classification_report(y_true, y_predict, True)
+    analysis.my_classification_report(y_true, y_predict, True)
     np.savetxt('y_pred.txt', y_predict, fmt="%s", delimiter=',')
     np.savetxt('y_true.txt', y_true, fmt="%s", delimiter=',')
-    analysis.my_confusion_matrix(y_true, y_predict)
+    #analysis.my_confusion_matrix(y_true, y_predict)
     #analysis.my_confusion_matrix(y_true, y_predict, ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'])
  
  #'C:\\Miniconda3\\envs\\HybridPy\\python38.zip\\model\\svm.model'

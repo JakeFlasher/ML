@@ -97,7 +97,7 @@ if __name__ == '__main__':
     st = time.time()
     iris = load_iris()
 
-    dataMat, dataLabel = utils.read_folder_img(cName = ['1'])
+    dataMat, dataLabel = utils.read_folder_img(cName = ['1'], limit=10000)
     print(dataMat.shape); print(dataLabel)
     path = sys.path[0]
     model_path=os.path.join(path,'model/svm_best.model')    

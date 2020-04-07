@@ -7,17 +7,17 @@ import png
 import os
 
 # 获取指定路径下的所有 .png 文件
-def file2list(path, prefix=".png"):
-    # file_list = []
-    # for filename in os.listdir(path):
-    #     ele_path = os.path.join(path, filename)
-    #     for imgname in os.listdir(ele_path):
-    #         subele_path = os.path.join(ele_path, imgname)
-    #         if (subele_path.endswith(".png")):
-    #             file_list.append(subele_path)
-    # return file_list
-    return [os.path.join(path, f) for f in os.listdir(path) if f.endswith(prefix)]
- 
+def file2list(path, prefix=".png", delimit=-1):
+    print("files listed now :")
+
+    if delimit == -1:
+        return [os.path.join(path, f) for f in os.listdir(path) if f.endswith(prefix)]
+    else:
+        #print([os.path.join(path, f) for f in os.listdir(path) if f.endswith(prefix)][::delimit])
+        print(len([os.path.join(path, f) for f in os.listdir(path) if f.endswith(prefix)][::delimit]))
+
+        return [os.path.join(path, f) for f in os.listdir(path) if f.endswith(prefix)][::delimit]
+
  
  
 # 解析出 .png 图件文件的名称
@@ -57,14 +57,16 @@ def read2convert(imgFileList):
     return dataMat, dataLabel
 
 # 读取训练数据
-def read_folder_img(cName=['1', '2', '3', '4', '5', '6', '7', '8', '9']):
+def read_folder_img(cName=['1', '2', '3', '4', '5', '6', '7', '8', '9'], delimit=-1):
     #cName = ['1', '2']
     train_data_path = "./mnist/train/0"
-    flist = file2list(train_data_path,".png")
+    #train_data_path = ".\\mnist\\train\\0"
+    flist = file2list(train_data_path,".png", delimit)
+    print(flist)
     dataMat, dataLabel = read2convert(flist)
     for c in cName:
         train_data_path_ = "./mnist/train/" + c
-        flist_ = file2list(train_data_path_,".png")
+        flist_ = file2list(train_data_path_,".png", delimit)
         dataMat_, dataLabel_ = read2convert(flist_)
         dataMat = np.concatenate((dataMat, dataMat_), axis=0)
         dataLabel = np.concatenate((dataLabel, dataLabel_), axis=0)

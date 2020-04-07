@@ -117,30 +117,30 @@ def print_s(name, value, sign='=', filename='metrics.txt'):
 def my_metrics(TN, FP, FN, TP, filename='metrics.txt'):
     # Sensitivity, hit rate, recall, or true positive rate
     TPR = TP/(TP+FN)
-    print_s('True positive rate', TPR, filename)
+    print_s('True positive rate', TPR,'=', filename)
     # Specificity or true negative rate
     TNR = TN/(TN+FP) 
-    print_s('True Negative rate', TNR, filename)
+    print_s('True Negative rate', TNR,'=', filename)
     # Precision or positive predictive value
     PPV = TP/(TP+FP)
-    print_s('Positive predictive value', PPV, filename)
+    print_s('Positive predictive value', PPV,'=', filename)
     # Negative predictive value
     NPV = TN/(TN+FN)
-    print_s('Negative predictive value', NPV, filename)
+    print_s('Negative predictive value', NPV,'=', filename)
     # Fall out or false positive rate
     FPR = FP/(FP+TN)
-    print_s('False positive rate', FPR, filename)
+    print_s('False positive rate', FPR,'=', filename)
     # False negative rate
     FNR = FN/(TP+FN)
-    print_s('False negative rate', FNR, filename)
+    print_s('False negative rate', FNR,'=', filename)
     # False discovery rate
     FDR = FP/(TP+FP)
-    print_s('False discovery rate', FDR, filename)
+    print_s('False discovery rate', FDR,'=', filename)
 
     precision = TP / (TP+FP)  # 查准率
-    print_s('Precision', precision, filename)
+    print_s('Precision', precision,'=', filename)
     recall = TP / (TP+FN)  # 查全率
-    print_s('Recall', recall, filename)
+    print_s('Recall', recall,'=', filename)
 
 def my_confusion_matrix(y_true, y_pred, label_list=[], filename='conf_mat.txt'):
     import numpy as np
@@ -155,7 +155,7 @@ def my_confusion_matrix(y_true, y_pred, label_list=[], filename='conf_mat.txt'):
     conf_mat = confusion_matrix(y_true, y_pred, labels = labels)
     print_s("Confusion matrix", conf_mat, '\n', filename)
     conf_mat = conf_mat.astype('float') / conf_mat.sum(axis=1)[:, np.newaxis]
-    #plot_confusion_matrix(list(set(y_true)), conf_mat, 'conf_mat.png', 'confusion matrix')
+    plot_confusion_matrix(list(set(y_true)), conf_mat, 'conf_mat.png', 'confusion matrix')
     print_s("Normalized confusion matrix", conf_mat, '\n', filename)
 
     if len(label_list) == 2:
@@ -171,9 +171,9 @@ def my_confusion_matrix(y_true, y_pred, label_list=[], filename='conf_mat.txt'):
 
     p_class, r_class, f_class, support_micro=precision_recall_fscore_support(y_true=y_true, y_pred=y_pred, average=None)
     #print(p_class); print(r_class); print(f_class); print(support_micro)
-    print_s('Macro F1 score', f_class.mean(), filename)
-    print_s('Micro F1 score', f1_score(y_true, y_pred, average='micro'), filename)
-    print_s('Weighted F1 score', f1_score(y_true, y_pred, average='weighted'), filename)
+    print_s('Macro F1 score', f_class.mean(), '=',filename)
+    print_s('Micro F1 score', f1_score(y_true, y_pred, average='micro'),'=', filename)
+    print_s('Weighted F1 score', f1_score(y_true, y_pred, average='weighted'),'=', filename)
 
     #np.savetxt('conf_mat.txt', conf_mat, delimiter=',')
     
@@ -216,5 +216,5 @@ if __name__ == '__main__':
 
         print(y_true)
 
-    #my_confusion_matrix(y_true, y_pred)
-    my_classification_report(y_true, y_pred, True)
+    my_confusion_matrix(y_true, y_pred)
+    #my_classification_report(y_true, y_pred, True)
